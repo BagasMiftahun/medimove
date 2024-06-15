@@ -68,7 +68,7 @@
                                     <td>{{ $obat->kode }}</td>
                                     <td>{{ $obat->nama }}</td>
                                     <td>{{ $obat->satuan }}</td>
-                                    <td>{{ $obat->harga }}</td>
+                                    <td>Rp {{ number_format(sprintf("%.2f", $obat->harga), 2, ',', '.') }}</td>
                                     <td>
                                         <button class="btn btn-icon btn-hover btn-sm btn-rounded" data-toggle="modal"
                                             data-target="#edit-obat-{{ $obat->id }}">

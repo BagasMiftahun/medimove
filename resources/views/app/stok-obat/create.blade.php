@@ -127,7 +127,7 @@
                     rupiah += separator + ribuan.join('.');
                 }
 
-                return 'Rp. ' + rupiah + ',' + decimalPart;
+                return rupiah + ',' + decimalPart;
             }
         });
     </script>
