@@ -30,7 +30,6 @@
                             <label class="col-sm-2 col-form-label control-label">Formasi</label>
                             <div class="col-md-5">
                                 <select class="form-control" name="formasi_id" required>
-                                    <option selected disabled>Choose</option>
                                     @foreach ($formasis as $formasi)
                                         <option value="{{ $formasi->id }}" {{ $stok->formasi_id == $formasi->id ? 'selected' : '' }}>{{ $formasi->nama }}</option>
                                     @endforeach
@@ -41,7 +40,6 @@
                             <label class="col-sm-2 col-form-label control-label">Obat</label>
                             <div class="col-md-5">
                                 <select class="form-control" id="obat-select" name="obat_id" required>
-                                    <option selected disabled>Choose</option>
                                     @foreach ($obats as $obat)
                                         <option value="{{ $obat->id }}" data-harga="{{ $obat->harga }}" {{ $stok->obat_id == $obat->id ? 'selected' : '' }}>{{ $obat->nama }}</option>
                                     @endforeach
@@ -54,7 +52,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">Rp</span>
                                 </div>
-                                <input type="text" class="form-control" id="harga" name="harga" value="{{ $stok->obat->harga }}" placeholder="Enter a Harga" required disabled>
+                                <input type="text" class="form-control" id="harga" name="harga" value="{{ number_format($stok->obat->harga, 2, ',', '.') }}" placeholder="Enter a Harga" required disabled>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -69,7 +67,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">Rp</span>
                                 </div>
-                                <input type="text" class="form-control" id="sub_total" name="sub_total" value="{{ $stok->obat->harga * $stok->stok }}" placeholder="Enter a Sub Total" required disabled>
+                                <input type="text" class="form-control" id="sub_total" name="sub_total" value="{{ number_format($stok->obat->harga * $stok->stok, 2, ',', '.') }}" placeholder="Enter a Sub Total" required disabled>
                             </div>
                         </div>
                         <div class="form-group text-right">
@@ -93,7 +91,7 @@
             $('#obat-select').change(function() {
                 var selectedOption = $(this).find('option:selected');
                 var harga = parseFloat(selectedOption.data('harga'));
-                $('#harga').val(formatRupiah(harga));
+                $('#harga').val(formatRupiah(harga.toFixed(2)));
                 calculateSubtotal();
             });
 
@@ -102,29 +100,29 @@
             });
 
             function calculateSubtotal() {
-                var harga = parseFloat($('#harga').val().replace(/[^0-9,-]+/g,"").replace(",", "."));
+                var harga = parseFloat($('#harga').val().replace(/[Rp.]/g, '').replace(',', '.'));
                 var stok = parseFloat($('#stok').val());
 
                 if (!isNaN(harga) && !isNaN(stok)) {
                     var subtotal = harga * stok;
-                    $('#sub_total').val(formatRupiah(subtotal));
+                    $('#sub_total').val(formatRupiah(subtotal.toFixed(2)));
                 }
             }
 
             function formatRupiah(angka) {
-                var parts = angka.toFixed(2).split('.');
-                var integerPart = parts[0];
-                var decimalPart = parts[1];
-                var sisa = integerPart.length % 3;
-                var rupiah = integerPart.substr(0, sisa);
-                var ribuan = integerPart.substr(sisa).match(/\d{3}/g);
-                
+                var number_string = angka.toString().replace('.', ',');
+                var split = number_string.split(',');
+                var sisa = split[0].length % 3;
+                var rupiah = split[0].substr(0, sisa);
+                var ribuan = split[0].substr(sisa).match(/\d{3}/g);
+
                 if (ribuan) {
                     var separator = sisa ? '.' : '';
                     rupiah += separator + ribuan.join('.');
                 }
 
-                return 'Rp. ' + rupiah + ',' + decimalPart;
+                rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+                return 'Rp. ' + rupiah;
             }
         });
     </script>

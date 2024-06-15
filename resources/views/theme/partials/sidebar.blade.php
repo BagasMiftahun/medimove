@@ -78,6 +78,22 @@
                     </li>
                 </ul>
             </li>
+            <li class="nav-item dropdown">
+                <a class="dropdown-toggle" href="javascript:void(0);">
+                    <span class="icon-holder">
+                        <i class="anticon anticon-user"></i>
+                    </span>
+                    <span class="title">Perpindahan</span>
+                    <span class="arrow">
+                        <i class="arrow-icon"></i>
+                    </span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li class="{{ Route::currentRouteName() == 'perpindahan.index' ? 'active' : '' }}">
+                        <a href="{{ route('perpindahan.index') }}">Perpindahan</a>
+                    </li>
+                </ul>
+            </li>
             {{-- <li class="nav-item dropdown">
                 <a class="dropdown-toggle" href="javascript:void(0);">
                     <span class="icon-holder">

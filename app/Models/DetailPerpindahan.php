@@ -20,4 +20,8 @@ class DetailPerpindahan extends Model
     {
         return $this->belongsTo(Perpindahan::class, 'perpindahan_id');
     }
+    public function obat()
+    {
+        return $this->belongsTo(Obat::class, 'obat_id');
+    }
 }

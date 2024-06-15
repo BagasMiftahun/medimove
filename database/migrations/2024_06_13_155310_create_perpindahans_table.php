@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('formasi_awal')->constrained('formasis')->onDelete('cascade');
             $table->foreignId('formasi_tujuan')->constrained('formasis')->onDelete('cascade');
             $table->string('keterangan')->nullable();
-            $table->bigInteger('nomor')->unique();
+            $table->string('nomor')->unique();
             $table->timestamps();
         });
     }
