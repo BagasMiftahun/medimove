@@ -18,7 +18,7 @@ use App\Http\Controllers\PerpindahanController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('perpindahan.index');
 });
 
 Route::resource('obat', ObatController::class);
