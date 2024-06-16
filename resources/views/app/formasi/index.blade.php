@@ -12,7 +12,7 @@
             <h2 class="header-title">Formasi</h2>
             <div class="header-sub-title">
                 <nav class="breadcrumb breadcrumb-dash">
-                    <a href="#" class="breadcrumb-item"><i class="anticon anticon-user m-r-5"></i>Service</a>
+                    <a href="#" class="breadcrumb-item"><i class="anticon anticon-contacts m-r-5"></i>MediMove</a>
                     <span class="breadcrumb-item active">Formasi</span>
                 </nav>
             </div>

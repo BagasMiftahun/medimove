@@ -1,7 +1,7 @@
 use App\Http\Controllers\StokObatController;
 @extends('theme.app')
 
-@section('title', 'Perpindahan | Laundry')
+@section('title', 'Perpindahan | MediMove')
 
 @section('style')
     <link href="{{ asset('assets/vendors/datatables/dataTables.bootstrap.min.css') }}" rel="stylesheet">

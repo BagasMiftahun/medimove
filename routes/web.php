@@ -29,3 +29,4 @@ Route::get('/stok-obat/{id}/harga', [StokObatController::class, 'getHarga']);
 
 Route::resource('perpindahan', PerpindahanController::class);
 Route::get('/get-obat-by-formasi', [PerpindahanController::class, 'getObatByFormasi'])->name('get.obat.by.formasi');
+Route::get('/get-obat-perpindahan', [PerpindahanController::class, 'getObatPerpindahan'])->name('get.obat.perpindahan');

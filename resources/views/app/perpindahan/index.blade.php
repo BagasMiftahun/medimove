@@ -1,7 +1,7 @@
 use App\Http\Controllers\StokObatController;
 @extends('theme.app')
 
-@section('title', 'Perpindahan | Laundry')
+@section('title', 'Perpindahan | MediMove')
 
 @section('style')
     <link href="{{ asset('assets/vendors/datatables/dataTables.bootstrap.min.css') }}" rel="stylesheet">
@@ -13,7 +13,7 @@ use App\Http\Controllers\StokObatController;
             <h2 class="header-title">Perpindahan</h2>
             <div class="header-sub-title">
                 <nav class="breadcrumb breadcrumb-dash">
-                    <a href="#" class="breadcrumb-item"><i class="anticon anticon-user m-r-5"></i>Laundry</a>
+                    <a href="#" class="breadcrumb-item"><i class="anticon anticon-schedule m-r-5"></i>MediMove</a>
                     <span class="breadcrumb-item active">Perpindahan</span>
                 </nav>
             </div>
@@ -100,7 +100,7 @@ use App\Http\Controllers\StokObatController;
                                     <td>
                                         <a href="{{ route('perpindahan.show', ['perpindahan' => $pindah->id]) }}">
                                             <button class="btn btn-icon btn-hover btn-sm btn-rounded">
-                                                    <i class="anticon anticon-edit"></i>
+                                                    <i class="anticon anticon-profile"></i>
                                             </button>                             
                                         </a>
                                         <a href="{{ route('perpindahan.edit', ['perpindahan' => $pindah->id]) }}">

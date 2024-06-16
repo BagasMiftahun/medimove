@@ -31,10 +31,10 @@ class PerpindahanController extends Controller
     public function getObatByFormasi(Request $request)
     {
         $formasi_id = $request->input('formasi_id');
-    
+
         // Ambil stok obat berdasarkan formasi_id yang dipilih
         $stoks = StokObat::where('formasi_id', $formasi_id)->with('obat')->get();
-    
+
         return response()->json($stoks->map(function($stok) {
             return [
                 'obat_id' => $stok->obat->id,
@@ -137,7 +137,7 @@ class PerpindahanController extends Controller
      */
     public function edit($id)
     {
-        $pindah = Perpindahan::findOrFail($id);
+        $pindah = Perpindahan::with('detailPerpindahan.obat')->findOrFail($id);
         $formasis = Formasi::all();
 
         return view('app.perpindahan.edit', compact('pindah', 'formasis'));
@@ -155,64 +155,86 @@ class PerpindahanController extends Controller
             'kuantitas.*' => 'required|numeric|min:1',
             'keterangan' => 'required|string',
         ]);
-
+    
         // Retrieve the Perpindahan instance
         $perpindahan = Perpindahan::findOrFail($id);
-
-        // Update perpindahan data
-        $perpindahan->formasi_awal = $request->input('formasi_awal');
-        $perpindahan->formasi_tujuan = $request->input('formasi_tujuan');
-        $perpindahan->keterangan = $request->input('keterangan');
-        $perpindahan->save();
-
-        // Delete existing detail perpindahan
-        DetailPerpindahan::where('perpindahan_id', $perpindahan->id)->delete();
-
+    
+        // Check if there are any changes in formasi awal
+        if ($perpindahan->formasi_awal != $request->input('formasi_awal')) {
+            // Delete existing detail perpindahan
+            DetailPerpindahan::where('perpindahan_id', $perpindahan->id)->delete();
+    
+            // Update perpindahan data
+            $perpindahan->formasi_awal = $request->input('formasi_awal');
+            $perpindahan->formasi_tujuan = $request->input('formasi_tujuan');
+            $perpindahan->keterangan = $request->input('keterangan');
+            $perpindahan->save();
+        } else {
+            // Only update keterangan if there are no changes in formasi awal
+            $perpindahan->formasi_tujuan = $request->input('formasi_tujuan');
+            $perpindahan->keterangan = $request->input('keterangan');
+            $perpindahan->save();
+        }
+    
         // Process updated perpindahan obat
         $obatIds = $request->input('obat_id');
         $kuantitas = $request->input('kuantitas');
-
+    
         foreach ($obatIds as $key => $obatId) {
-            $obat = StokObat::where('formasi_id', $perpindahan->formasi_awal)
-                            ->where('obat_id', $obatId)
-                            ->first();
+            // Find existing detail perpindahan
+            $existingDetail = DetailPerpindahan::where('perpindahan_id', $perpindahan->id)
+                ->where('obat_id', $obatId)
+                ->first();
+    
+            // Calculate kuantitas change
+            $oldKuantitas = $existingDetail ? $existingDetail->kuantitas : 0;
+            $newKuantitas = $kuantitas[$key];
+    
+            // Calculate difference in kuantitas
+            $jumlahPengurangan = $oldKuantitas - $newKuantitas;
+            $jumlahPertambahan = $newKuantitas - $oldKuantitas;
+    
 
-            if ($obat) {
-                // Kurangi stok di formasi awal
-                $stokAwalBaru = $obat->stok - $kuantitas[$key];
-                if ($stokAwalBaru <= 0) {
-                    $obat->delete(); // Hapus jika stok 0 atau kurang
-                } else {
-                    $obat->update(['stok' => $stokAwalBaru]);
-                }
+            if($newKuantitas > $oldKuantitas){
+                // Update stok obat in formasi awal
+                $stokObatAwal = StokObat::where('formasi_id', $perpindahan->formasi_awal)
+                    ->where('obat_id', $obatId)
+                    ->firstOrFail();
+                $stokObatAwal->update(['stok' => $stokObatAwal->stok - $jumlahPertambahan]);
 
-                // Tambah atau update stok di formasi tujuan
-                $obatTujuan = StokObat::where('formasi_id', $perpindahan->formasi_tujuan)
-                                    ->where('obat_id', $obatId)
-                                    ->first();
+                // Update stok obat in formasi tujuan
+                $stokObatTujuan = StokObat::where('formasi_id', $perpindahan->formasi_tujuan)
+                    ->where('obat_id', $obatId)
+                    ->firstOrFail();
+                $stokObatTujuan->update(['stok' => $stokObatTujuan->stok + $jumlahPertambahan]);
+            }elseif($newKuantitas < $oldKuantitas){
+                // Update stok obat in formasi awal
+                $stokObatAwal = StokObat::where('formasi_id', $perpindahan->formasi_awal)
+                    ->where('obat_id', $obatId)
+                    ->firstOrFail();
+                $stokObatAwal->update(['stok' => $stokObatAwal->stok + $jumlahPengurangan]);
 
-                if ($obatTujuan) {
-                    $obatTujuan->update(['stok' => $obatTujuan->stok + $kuantitas[$key]]);
-                } else {
-                    StokObat::create([
-                        'formasi_id' => $perpindahan->formasi_tujuan,
-                        'obat_id' => $obatId,
-                        'stok' => $kuantitas[$key],
-                    ]);
-                }
-
-                // Simpan detail perpindahan
+                // Update stok obat in formasi tujuan
+                $stokObatTujuan = StokObat::where('formasi_id', $perpindahan->formasi_tujuan)
+                    ->where('obat_id', $obatId)
+                    ->firstOrFail();
+                $stokObatTujuan->update(['stok' => $stokObatTujuan->stok - $jumlahPengurangan]);
+            }
+    
+            // Update or create detail perpindahan
+            if ($existingDetail) {
+                $existingDetail->update(['kuantitas' => $newKuantitas]);
+            } else {
                 DetailPerpindahan::create([
                     'perpindahan_id' => $perpindahan->id,
                     'obat_id' => $obatId,
-                    'kuantitas' => $kuantitas[$key],
+                    'kuantitas' => $newKuantitas,
                 ]);
             }
         }
-
+    
         return redirect()->route('perpindahan.index')->with('success', 'Perpindahan obat berhasil diperbarui.');
     }
-
 
     /**
      * Remove the specified resource from storage.
@@ -224,4 +246,29 @@ class PerpindahanController extends Controller
     
         return redirect()->back()->with('success', 'Perpindahan Obat has been deleted successfully.');
     }
+
+    public function getObatPerpindahan(Request $request)
+    {
+        $formasi_awal_id = $request->input('formasi_awal_id');
+        $formasi_tujuan_id = $request->input('formasi_tujuan_id');
+
+        // Ambil obat dari perpindahan yang sesuai dengan formasi_awal_id dan formasi_tujuan_id
+        $detailPerpindahan = Perpindahan::whereHas('detailPerpindahan', function ($query) use ($formasi_awal_id, $formasi_tujuan_id) {
+            $query->where('formasi_awal', $formasi_awal_id)->where('formasi_tujuan', $formasi_tujuan_id);
+        })->get();
+
+        return response()->json($detailPerpindahan->map(function($detail) {
+            return [
+                'obat_id' => $detail->detailPerpindahan->obat_id,
+                'obat' => [
+                    'nama' => $detail->detailPerpindahan->obat->nama,
+                    'harga' => $detail->detailPerpindahan->obat->harga,
+                    'satuan' => $detail->detailPerpindahan->obat->satuan
+                ],
+                'kuantitas' => $detail->detailPerpindahan->kuantitas,
+                'stok' => $detail->detailPerpindahan->obat->stok // Jika diperlukan, ambil stok dari relasi obat
+            ];
+        }));
+    }
+
 }

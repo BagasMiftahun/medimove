@@ -1,7 +1,7 @@
 use App\Http\Controllers\StokObatController;
 @extends('theme.app')
 
-@section('title', 'Stok Obat | Laundry')
+@section('title', 'Stok Obat | MediMove')
 
 @section('style')
     <link href="{{ asset('assets/vendors/datatables/dataTables.bootstrap.min.css') }}" rel="stylesheet">
@@ -13,7 +13,7 @@ use App\Http\Controllers\StokObatController;
             <h2 class="header-title">Stok Obat</h2>
             <div class="header-sub-title">
                 <nav class="breadcrumb breadcrumb-dash">
-                    <a href="#" class="breadcrumb-item"><i class="anticon anticon-user m-r-5"></i>Laundry</a>
+                    <a href="#" class="breadcrumb-item"><i class="anticon anticon-shop m-r-5"></i>MediMove</a>
                     <span class="breadcrumb-item active">Stok Obat</span>
                 </nav>
             </div>

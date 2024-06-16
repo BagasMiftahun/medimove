@@ -1,9 +1,4 @@
-CREATE TABLE obats
-(    kode	INT,
-    nama	VARCHAR(512),
-    satuan	VARCHAR(512),
-     harga 	DECIMAL(10, 2)
-);
+
 
 INSERT INTO obats (kode, nama, satuan,  harga ) VALUES
 	('00000001', 'AMOXSAN CAPS 500 MG (R)', 'CAPSUL', 3020.00),
@@ -257,11 +252,6 @@ INSERT INTO obats (kode, nama, satuan,  harga ) VALUES
 	('00000595', 'CLINDAMYCIN CAPS 300 MG ', 'CAPSUL', 1250.40),
 	('00000599', 'PAPAVERIN TAB 40 MG', 'TABLET', 460.00);
 
-
-CREATE TABLE formasis
-(    kode	VARCHAR(10),
-     nama	VARCHAR(512),
-);
 
 INSERT INTO formasis(kode, nama) VALUES
 	('01', 'Gudang Farmasi'),
